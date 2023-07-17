@@ -37,6 +37,8 @@ jobs:
           kind load docker-image -n chart-testing quay.io/datashim-io/generate-keys:latest
       - name: Install Datashim
         run: make deployment
+      - name: Validate readiness probe
+        run: kubectl -n dlf wait --for=condition=ready -l app.kubernetes.io/name=dlf,name=dataset-operator, pod
       - name: Create sample Dataset
         run: |
           cat <<EOF | kubectl apply -f -
@@ -103,3 +105,4 @@ jobs:
             backoffLimit: 1
           EOF
           kubectl wait --for=condition=complete job/ds-read --timeout=2m
+        
